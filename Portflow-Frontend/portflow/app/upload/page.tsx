@@ -43,25 +43,91 @@ export default function UploadPage() {
     };
 
     const handleUpload = async () => {
-        if (!file) return;
+        if (!file) {
+            console.warn('[Upload] No file selected');
+            return;
+        }
+
+        console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log('[Upload] Starting upload process');
+        console.log('[Upload] File information:', {
+            name: file.name,
+            size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
+            type: file.type,
+            lastModified: new Date(file.lastModified).toLocaleString()
+        });
+
+        // Validate file type
+        if (file.type !== 'application/pdf') {
+            console.error('[Upload] Invalid file type:', file.type);
+            toast.error("Invalid File", {
+                description: `File type ${file.type} is not supported. Please upload a PDF file.`,
+            });
+            return;
+        }
+
+        // Validate file size (max 10MB)
+        const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+        if (file.size > maxSize) {
+            console.error('[Upload] File too large:', file.size);
+            toast.error("File Too Large", {
+                description: `File size ${(file.size / 1024 / 1024).toFixed(2)} MB exceeds maximum of 10MB.`,
+            });
+            return;
+        }
+
+        console.log('[Upload] File validation passed');
 
         setIsUploading(true);
         try {
+            console.log('[Upload] Calling API...');
             const result = await api.uploadBillOfLading(file);
+            console.log('[Upload] API call successful:', result);
 
             toast.success("Success!", {
                 description: `Container ${result.container_id} created successfully.`,
             });
 
+            console.log('[Upload] Redirecting to container page:', result.container_id);
             // Redirect to container detail page
             router.push(`/containers/${result.container_id}`);
         } catch (error) {
-            const message = error instanceof Error ? error.message : "Unknown error";
+            console.error('[Upload] Upload failed:', error);
+            console.error('[Upload] Error type:', error instanceof Error ? error.constructor.name : typeof error);
+            
+            let message = "Unknown error";
+            let details = "";
+            
+            if (error instanceof Error) {
+                message = error.message;
+                console.error('[Upload] Error message:', message);
+                console.error('[Upload] Error stack:', error.stack);
+            }
+
+            // Extract additional details from APIError
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            if ((error as any).status) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const apiError = error as any;
+                console.error('[Upload] HTTP Status:', apiError.status);
+                console.error('[Upload] Status Text:', apiError.statusText);
+                console.error('[Upload] Error Data:', apiError.data);
+                
+                details = `HTTP ${apiError.status}: ${apiError.statusText}`;
+                if (apiError.data?.detail) {
+                    details += ` - ${apiError.data.detail}`;
+                }
+            }
+
             toast.error("Upload Failed", {
-                description: message,
+                description: details || message,
             });
+
+            console.log('[Upload] Error details displayed to user');
         } finally {
             setIsUploading(false);
+            console.log('[Upload] Upload process completed');
+            console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
         }
     };
 

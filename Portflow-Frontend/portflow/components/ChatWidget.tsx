@@ -1,5 +1,19 @@
 "use client";
 
+/**
+ * IBM watsonx Chat Widget Integration
+ * Updated: Nov 23, 2025
+ * 
+ * This component dynamically loads the watsonx chat widget with:
+ * - Configuration fetched from backend API
+ * - JWT token authentication with auto-refresh
+ * - Proper cleanup and error handling
+ * 
+ * Backend endpoints:
+ * - GET /api/watsonx/config - Widget configuration
+ * - GET /api/watsonx/token - JWT authentication token
+ */
+
 import { useEffect, useState } from "react";
 import { MessageCircle } from "lucide-react";
 
