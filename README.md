@@ -1,6 +1,6 @@
 # 🚢 PortFlow: AI-Powered Digital Clearing Agent for Lagos Ports
 
-![PortFlow Banner](assets\PortFlowImage.png)
+![PortFlow Banner](assets/PortFlowImage.png)
 
 > **Built for the Agentic AI Hackathon with IBM watsonx Orchestrate**
 
