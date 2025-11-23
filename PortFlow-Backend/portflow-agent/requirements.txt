@@ -1,0 +1,13 @@
+django
+django-ninja
+python-decouple
+ibm-watsonx-orchestrate
+psycopg2-binary
+uvicorn
+requests
+django-cors-headers
+PyMuPDF
+Pillow
+pytesseract
+python-multipart
+PyJWT

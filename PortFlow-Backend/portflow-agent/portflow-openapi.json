@@ -1,0 +1,1114 @@
+﻿{
+    "openapi":  "3.1.0",
+    "info":  {
+                 "title":  "PortFlow Clearing Agent API",
+                 "version":  "1.0.0",
+                 "description":  "AI-powered digital clearing agent for Lagos ports"
+             },
+    "paths":  {
+                  "/api/upload":  {
+                                      "post":  {
+                                                   "operationId":  "core_api_upload_bill_of_lading",
+                                                   "summary":  "Upload Bill Of Lading",
+                                                   "parameters":  [
+
+                                                                  ],
+                                                   "responses":  {
+                                                                     "200":  {
+                                                                                 "description":  "OK",
+                                                                                 "content":  {
+                                                                                                 "application/json":  {
+                                                                                                                          "schema":  {
+                                                                                                                                         "$ref":  "#/components/schemas/ContainerCreateSchema"
+                                                                                                                                     }
+                                                                                                                      }
+                                                                                             }
+                                                                             },
+                                                                     "400":  {
+                                                                                 "description":  "Bad Request",
+                                                                                 "content":  {
+                                                                                                 "application/json":  {
+                                                                                                                          "schema":  {
+                                                                                                                                         "$ref":  "#/components/schemas/ErrorSchema"
+                                                                                                                                     }
+                                                                                                                      }
+                                                                                             }
+                                                                             },
+                                                                     "500":  {
+                                                                                 "description":  "Internal Server Error",
+                                                                                 "content":  {
+                                                                                                 "application/json":  {
+                                                                                                                          "schema":  {
+                                                                                                                                         "$ref":  "#/components/schemas/ErrorSchema"
+                                                                                                                                     }
+                                                                                                                      }
+                                                                                             }
+                                                                             }
+                                                                 },
+                                                   "description":  "Upload a Bill of Lading document to initiate the clearance workflow.\n\nThis endpoint:\n1. Accepts a PDF file containing the Bill of Lading\n2. Extracts container information using OCR/text parsing\n3. Creates a new container record in the database\n4. Returns the container ID for tracking",
+                                                   "tags":  [
+                                                                "Container Operations"
+                                                            ],
+                                                   "requestBody":  {
+                                                                       "content":  {
+                                                                                       "multipart/form-data":  {
+                                                                                                                   "schema":  {
+                                                                                                                                  "properties":  {
+                                                                                                                                                     "file":  {
+                                                                                                                                                                  "format":  "binary",
+                                                                                                                                                                  "title":  "File",
+                                                                                                                                                                  "type":  "string"
+                                                                                                                                                              }
+                                                                                                                                                 },
+                                                                                                                                  "required":  [
+                                                                                                                                                   "file"
+                                                                                                                                               ],
+                                                                                                                                  "title":  "FileParams",
+                                                                                                                                  "type":  "object"
+                                                                                                                              }
+                                                                                                               }
+                                                                                   },
+                                                                       "required":  true
+                                                                   }
+                                               }
+                                  },
+                  "/api/containers/{container_id}":  {
+                                                         "get":  {
+                                                                     "operationId":  "core_api_get_container_status",
+                                                                     "summary":  "Get Container Status",
+                                                                     "parameters":  [
+                                                                                        {
+                                                                                            "in":  "path",
+                                                                                            "name":  "container_id",
+                                                                                            "schema":  {
+                                                                                                           "title":  "Container Id",
+                                                                                                           "type":  "string"
+                                                                                                       },
+                                                                                            "required":  true
+                                                                                        }
+                                                                                    ],
+                                                                     "responses":  {
+                                                                                       "200":  {
+                                                                                                   "description":  "OK",
+                                                                                                   "content":  {
+                                                                                                                   "application/json":  {
+                                                                                                                                            "schema":  {
+                                                                                                                                                           "$ref":  "#/components/schemas/ContainerSchema"
+                                                                                                                                                       }
+                                                                                                                                        }
+                                                                                                               }
+                                                                                               },
+                                                                                       "404":  {
+                                                                                                   "description":  "Not Found",
+                                                                                                   "content":  {
+                                                                                                                   "application/json":  {
+                                                                                                                                            "schema":  {
+                                                                                                                                                           "$ref":  "#/components/schemas/ErrorSchema"
+                                                                                                                                                       }
+                                                                                                                                        }
+                                                                                                               }
+                                                                                               }
+                                                                                   },
+                                                                     "description":  "Get the current status and complete information for a container.\n\nThis is the primary endpoint for checking container progress through the clearance workflow.",
+                                                                     "tags":  [
+                                                                                  "Container Operations"
+                                                                              ]
+                                                                 }
+                                                     },
+                  "/api/containers":  {
+                                          "get":  {
+                                                      "operationId":  "core_api_list_containers",
+                                                      "summary":  "List Containers",
+                                                      "parameters":  [
+                                                                         {
+                                                                             "in":  "query",
+                                                                             "name":  "status",
+                                                                             "schema":  {
+                                                                                            "title":  "Status",
+                                                                                            "type":  "string"
+                                                                                        },
+                                                                             "required":  false
+                                                                         },
+                                                                         {
+                                                                             "in":  "query",
+                                                                             "name":  "limit",
+                                                                             "schema":  {
+                                                                                            "default":  100,
+                                                                                            "title":  "Limit",
+                                                                                            "type":  "integer"
+                                                                                        },
+                                                                             "required":  false
+                                                                         }
+                                                                     ],
+                                                      "responses":  {
+                                                                        "200":  {
+                                                                                    "description":  "OK",
+                                                                                    "content":  {
+                                                                                                    "application/json":  {
+                                                                                                                             "schema":  {
+                                                                                                                                            "$ref":  "#/components/schemas/ContainerListSchema"
+                                                                                                                                        }
+                                                                                                                         }
+                                                                                                }
+                                                                                }
+                                                                    },
+                                                      "description":  "List all containers, optionally filtered by status.\n\nQuery parameters:\n- status: Filter by overall_status (e.g., PENDING_VALIDATION, CUSTOMS_CLEARED)\n- limit: Maximum number of results (default: 100)",
+                                                      "tags":  [
+                                                                   "Container Operations"
+                                                               ]
+                                                  }
+                                      },
+                  "/api/validate":  {
+                                        "post":  {
+                                                     "operationId":  "core_api_validate_container",
+                                                     "summary":  "Validate Container",
+                                                     "parameters":  [
+
+                                                                    ],
+                                                     "responses":  {
+                                                                       "200":  {
+                                                                                   "description":  "OK",
+                                                                                   "content":  {
+                                                                                                   "application/json":  {
+                                                                                                                            "schema":  {
+                                                                                                                                           "$ref":  "#/components/schemas/ValidationResponseSchema"
+                                                                                                                                       }
+                                                                                                                        }
+                                                                                               }
+                                                                               },
+                                                                       "404":  {
+                                                                                   "description":  "Not Found",
+                                                                                   "content":  {
+                                                                                                   "application/json":  {
+                                                                                                                            "schema":  {
+                                                                                                                                           "$ref":  "#/components/schemas/ErrorSchema"
+                                                                                                                                       }
+                                                                                                                        }
+                                                                                               }
+                                                                               }
+                                                                   },
+                                                     "description":  "Validate a container\u0027s documentation and data.\n\nThis endpoint performs business logic validation and updates the container status.\nThe AI agent should call this after a document is uploaded.",
+                                                     "tags":  [
+                                                                  "Container Operations"
+                                                              ],
+                                                     "requestBody":  {
+                                                                         "content":  {
+                                                                                         "application/json":  {
+                                                                                                                  "schema":  {
+                                                                                                                                 "$ref":  "#/components/schemas/ValidationRequestSchema"
+                                                                                                                             }
+                                                                                                              }
+                                                                                     },
+                                                                         "required":  true
+                                                                     }
+                                                 }
+                                    },
+                  "/api/customs/status/{container_id}":  {
+                                                             "get":  {
+                                                                         "operationId":  "core_api_check_customs_status",
+                                                                         "summary":  "Check Customs Status",
+                                                                         "parameters":  [
+                                                                                            {
+                                                                                                "in":  "path",
+                                                                                                "name":  "container_id",
+                                                                                                "schema":  {
+                                                                                                               "title":  "Container Id",
+                                                                                                               "type":  "string"
+                                                                                                           },
+                                                                                                "required":  true
+                                                                                            }
+                                                                                        ],
+                                                                         "responses":  {
+                                                                                           "200":  {
+                                                                                                       "description":  "OK",
+                                                                                                       "content":  {
+                                                                                                                       "application/json":  {
+                                                                                                                                                "schema":  {
+                                                                                                                                                               "$ref":  "#/components/schemas/CustomsStatusResponseSchema"
+                                                                                                                                                           }
+                                                                                                                                            }
+                                                                                                                   }
+                                                                                                   },
+                                                                                           "404":  {
+                                                                                                       "description":  "Not Found",
+                                                                                                       "content":  {
+                                                                                                                       "application/json":  {
+                                                                                                                                                "schema":  {
+                                                                                                                                                               "$ref":  "#/components/schemas/ErrorSchema"
+                                                                                                                                                           }
+                                                                                                                                            }
+                                                                                                                   }
+                                                                                                   }
+                                                                                       },
+                                                                         "description":  "Check the customs clearance status for a container.\n\nThis endpoint simulates querying the Nigerian Customs Service system.\nThe agent should call this to determine if customs duties are owed.",
+                                                                         "tags":  [
+                                                                                      "Customs Operations"
+                                                                                  ]
+                                                                     }
+                                                         },
+                  "/api/customs/pay":  {
+                                           "post":  {
+                                                        "operationId":  "core_api_pay_customs_duty",
+                                                        "summary":  "Pay Customs Duty",
+                                                        "parameters":  [
+
+                                                                       ],
+                                                        "responses":  {
+                                                                          "200":  {
+                                                                                      "description":  "OK",
+                                                                                      "content":  {
+                                                                                                      "application/json":  {
+                                                                                                                               "schema":  {
+                                                                                                                                              "$ref":  "#/components/schemas/CustomsPaymentResponseSchema"
+                                                                                                                                          }
+                                                                                                                           }
+                                                                                                  }
+                                                                                  },
+                                                                          "400":  {
+                                                                                      "description":  "Bad Request",
+                                                                                      "content":  {
+                                                                                                      "application/json":  {
+                                                                                                                               "schema":  {
+                                                                                                                                              "$ref":  "#/components/schemas/ErrorSchema"
+                                                                                                                                          }
+                                                                                                                           }
+                                                                                                  }
+                                                                                  },
+                                                                          "404":  {
+                                                                                      "description":  "Not Found",
+                                                                                      "content":  {
+                                                                                                      "application/json":  {
+                                                                                                                               "schema":  {
+                                                                                                                                              "$ref":  "#/components/schemas/ErrorSchema"
+                                                                                                                                          }
+                                                                                                                           }
+                                                                                                  }
+                                                                                  }
+                                                                      },
+                                                        "description":  "Process customs duty payment for a container.\n\nThe agent should call this endpoint after informing the user of the amount due\nand receiving confirmation to proceed with payment.",
+                                                        "tags":  [
+                                                                     "Customs Operations"
+                                                                 ],
+                                                        "requestBody":  {
+                                                                            "content":  {
+                                                                                            "application/json":  {
+                                                                                                                     "schema":  {
+                                                                                                                                    "$ref":  "#/components/schemas/CustomsPaymentRequestSchema"
+                                                                                                                                }
+                                                                                                                 }
+                                                                                        },
+                                                                            "required":  true
+                                                                        }
+                                                    }
+                                       },
+                  "/api/shipping/status/{container_id}":  {
+                                                              "get":  {
+                                                                          "operationId":  "core_api_check_shipping_status",
+                                                                          "summary":  "Check Shipping Status",
+                                                                          "parameters":  [
+                                                                                             {
+                                                                                                 "in":  "path",
+                                                                                                 "name":  "container_id",
+                                                                                                 "schema":  {
+                                                                                                                "title":  "Container Id",
+                                                                                                                "type":  "string"
+                                                                                                            },
+                                                                                                 "required":  true
+                                                                                             }
+                                                                                         ],
+                                                                          "responses":  {
+                                                                                            "200":  {
+                                                                                                        "description":  "OK",
+                                                                                                        "content":  {
+                                                                                                                        "application/json":  {
+                                                                                                                                                 "schema":  {
+                                                                                                                                                                "$ref":  "#/components/schemas/ShippingStatusResponseSchema"
+                                                                                                                                                            }
+                                                                                                                                             }
+                                                                                                                    }
+                                                                                                    },
+                                                                                            "404":  {
+                                                                                                        "description":  "Not Found",
+                                                                                                        "content":  {
+                                                                                                                        "application/json":  {
+                                                                                                                                                 "schema":  {
+                                                                                                                                                                "$ref":  "#/components/schemas/ErrorSchema"
+                                                                                                                                                            }
+                                                                                                                                             }
+                                                                                                                    }
+                                                                                                    }
+                                                                                        },
+                                                                          "description":  "Check the shipping/vessel status for a container.\n\nThis endpoint simulates querying the Nigerian Ports Authority (NPA) system.",
+                                                                          "tags":  [
+                                                                                       "Shipping Operations"
+                                                                                   ]
+                                                                      }
+                                                          },
+                  "/api/inspection/schedule":  {
+                                                   "post":  {
+                                                                "operationId":  "core_api_schedule_inspection",
+                                                                "summary":  "Schedule Inspection",
+                                                                "parameters":  [
+
+                                                                               ],
+                                                                "responses":  {
+                                                                                  "200":  {
+                                                                                              "description":  "OK",
+                                                                                              "content":  {
+                                                                                                              "application/json":  {
+                                                                                                                                       "schema":  {
+                                                                                                                                                      "$ref":  "#/components/schemas/InspectionScheduleResponseSchema"
+                                                                                                                                                  }
+                                                                                                                                   }
+                                                                                                          }
+                                                                                          },
+                                                                                  "400":  {
+                                                                                              "description":  "Bad Request",
+                                                                                              "content":  {
+                                                                                                              "application/json":  {
+                                                                                                                                       "schema":  {
+                                                                                                                                                      "$ref":  "#/components/schemas/ErrorSchema"
+                                                                                                                                                  }
+                                                                                                                                   }
+                                                                                                          }
+                                                                                          },
+                                                                                  "404":  {
+                                                                                              "description":  "Not Found",
+                                                                                              "content":  {
+                                                                                                              "application/json":  {
+                                                                                                                                       "schema":  {
+                                                                                                                                                      "$ref":  "#/components/schemas/ErrorSchema"
+                                                                                                                                                  }
+                                                                                                                                   }
+                                                                                                          }
+                                                                                          }
+                                                                              },
+                                                                "description":  "Schedule a physical inspection with the Nigerian Ports Authority.\n\nThe agent should call this after customs clearance to arrange inspection.",
+                                                                "tags":  [
+                                                                             "Inspection Operations"
+                                                                         ],
+                                                                "requestBody":  {
+                                                                                    "content":  {
+                                                                                                    "application/json":  {
+                                                                                                                             "schema":  {
+                                                                                                                                            "$ref":  "#/components/schemas/InspectionScheduleRequestSchema"
+                                                                                                                                        }
+                                                                                                                         }
+                                                                                                },
+                                                                                    "required":  true
+                                                                                }
+                                                            }
+                                               },
+                  "/api/inspection/complete/{container_id}":  {
+                                                                  "post":  {
+                                                                               "operationId":  "core_api_complete_inspection",
+                                                                               "summary":  "Complete Inspection",
+                                                                               "parameters":  [
+                                                                                                  {
+                                                                                                      "in":  "path",
+                                                                                                      "name":  "container_id",
+                                                                                                      "schema":  {
+                                                                                                                     "title":  "Container Id",
+                                                                                                                     "type":  "string"
+                                                                                                                 },
+                                                                                                      "required":  true
+                                                                                                  },
+                                                                                                  {
+                                                                                                      "in":  "query",
+                                                                                                      "name":  "passed",
+                                                                                                      "schema":  {
+                                                                                                                     "default":  true,
+                                                                                                                     "title":  "Passed",
+                                                                                                                     "type":  "boolean"
+                                                                                                                 },
+                                                                                                      "required":  false
+                                                                                                  }
+                                                                                              ],
+                                                                               "responses":  {
+                                                                                                 "200":  {
+                                                                                                             "description":  "OK",
+                                                                                                             "content":  {
+                                                                                                                             "application/json":  {
+                                                                                                                                                      "schema":  {
+                                                                                                                                                                     "$ref":  "#/components/schemas/SuccessSchema"
+                                                                                                                                                                 }
+                                                                                                                                                  }
+                                                                                                                         }
+                                                                                                         },
+                                                                                                 "404":  {
+                                                                                                             "description":  "Not Found",
+                                                                                                             "content":  {
+                                                                                                                             "application/json":  {
+                                                                                                                                                      "schema":  {
+                                                                                                                                                                     "$ref":  "#/components/schemas/ErrorSchema"
+                                                                                                                                                                 }
+                                                                                                                                                  }
+                                                                                                                         }
+                                                                                                         }
+                                                                                             },
+                                                                               "description":  "Mark an inspection as completed.\n\nThis is a utility endpoint for demo purposes.",
+                                                                               "tags":  [
+                                                                                            "Inspection Operations"
+                                                                                        ]
+                                                                           }
+                                                              },
+                  "/api/inspection/release/{container_id}":  {
+                                                                 "post":  {
+                                                                              "operationId":  "core_api_release_container",
+                                                                              "summary":  "Release Container",
+                                                                              "parameters":  [
+                                                                                                 {
+                                                                                                     "in":  "path",
+                                                                                                     "name":  "container_id",
+                                                                                                     "schema":  {
+                                                                                                                    "title":  "Container Id",
+                                                                                                                    "type":  "string"
+                                                                                                                },
+                                                                                                     "required":  true
+                                                                                                 }
+                                                                                             ],
+                                                                              "responses":  {
+                                                                                                "200":  {
+                                                                                                            "description":  "OK",
+                                                                                                            "content":  {
+                                                                                                                            "application/json":  {
+                                                                                                                                                     "schema":  {
+                                                                                                                                                                    "$ref":  "#/components/schemas/SuccessSchema"
+                                                                                                                                                                }
+                                                                                                                                                 }
+                                                                                                                        }
+                                                                                                        },
+                                                                                                "400":  {
+                                                                                                            "description":  "Bad Request",
+                                                                                                            "content":  {
+                                                                                                                            "application/json":  {
+                                                                                                                                                     "schema":  {
+                                                                                                                                                                    "$ref":  "#/components/schemas/ErrorSchema"
+                                                                                                                                                                }
+                                                                                                                                                 }
+                                                                                                                        }
+                                                                                                        },
+                                                                                                "404":  {
+                                                                                                            "description":  "Not Found",
+                                                                                                            "content":  {
+                                                                                                                            "application/json":  {
+                                                                                                                                                     "schema":  {
+                                                                                                                                                                    "$ref":  "#/components/schemas/ErrorSchema"
+                                                                                                                                                                }
+                                                                                                                                                 }
+                                                                                                                        }
+                                                                                                        }
+                                                                                            },
+                                                                              "description":  "Release a container for pickup after all clearances are complete.\n\nThe agent should call this after inspection passes.",
+                                                                              "tags":  [
+                                                                                           "Inspection Operations"
+                                                                                       ]
+                                                                          }
+                                                             }
+              },
+    "components":  {
+                       "schemas":  {
+                                       "ContainerCreateSchema":  {
+                                                                     "description":  "Schema for container creation response",
+                                                                     "properties":  {
+                                                                                        "container_id":  {
+                                                                                                             "title":  "Container Id",
+                                                                                                             "type":  "string"
+                                                                                                         },
+                                                                                        "overall_status":  {
+                                                                                                               "title":  "Overall Status",
+                                                                                                               "type":  "string"
+                                                                                                           },
+                                                                                        "message":  {
+                                                                                                        "title":  "Message",
+                                                                                                        "type":  "string"
+                                                                                                    }
+                                                                                    },
+                                                                     "required":  [
+                                                                                      "container_id",
+                                                                                      "overall_status",
+                                                                                      "message"
+                                                                                  ],
+                                                                     "title":  "ContainerCreateSchema",
+                                                                     "type":  "object"
+                                                                 },
+                                       "ErrorSchema":  {
+                                                           "description":  "Standard error response schema",
+                                                           "properties":  {
+                                                                              "error":  {
+                                                                                            "title":  "Error",
+                                                                                            "type":  "string"
+                                                                                        },
+                                                                              "details":  {
+                                                                                              "anyOf":  [
+                                                                                                            {
+                                                                                                                "type":  "string"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "type":  "null"
+                                                                                                            }
+                                                                                                        ],
+                                                                                              "title":  "Details"
+                                                                                          }
+                                                                          },
+                                                           "required":  [
+                                                                            "error"
+                                                                        ],
+                                                           "title":  "ErrorSchema",
+                                                           "type":  "object"
+                                                       },
+                                       "ContainerSchema":  {
+                                                               "description":  "Complete container information schema",
+                                                               "properties":  {
+                                                                                  "container_id":  {
+                                                                                                       "title":  "Container Id",
+                                                                                                       "type":  "string"
+                                                                                                   },
+                                                                                  "overall_status":  {
+                                                                                                         "title":  "Overall Status",
+                                                                                                         "type":  "string"
+                                                                                                     },
+                                                                                  "vessel_name":  {
+                                                                                                      "anyOf":  [
+                                                                                                                    {
+                                                                                                                        "type":  "string"
+                                                                                                                    },
+                                                                                                                    {
+                                                                                                                        "type":  "null"
+                                                                                                                    }
+                                                                                                                ],
+                                                                                                      "title":  "Vessel Name"
+                                                                                                  },
+                                                                                  "importer_name":  {
+                                                                                                        "anyOf":  [
+                                                                                                                      {
+                                                                                                                          "type":  "string"
+                                                                                                                      },
+                                                                                                                      {
+                                                                                                                          "type":  "null"
+                                                                                                                      }
+                                                                                                                  ],
+                                                                                                        "title":  "Importer Name"
+                                                                                                    },
+                                                                                  "importer_address":  {
+                                                                                                           "anyOf":  [
+                                                                                                                         {
+                                                                                                                             "type":  "string"
+                                                                                                                         },
+                                                                                                                         {
+                                                                                                                             "type":  "null"
+                                                                                                                         }
+                                                                                                                     ],
+                                                                                                           "title":  "Importer Address"
+                                                                                                       },
+                                                                                  "tin":  {
+                                                                                              "anyOf":  [
+                                                                                                            {
+                                                                                                                "type":  "string"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "type":  "null"
+                                                                                                            }
+                                                                                                        ],
+                                                                                              "title":  "Tin"
+                                                                                          },
+                                                                                  "port_of_loading":  {
+                                                                                                          "anyOf":  [
+                                                                                                                        {
+                                                                                                                            "type":  "string"
+                                                                                                                        },
+                                                                                                                        {
+                                                                                                                            "type":  "null"
+                                                                                                                        }
+                                                                                                                    ],
+                                                                                                          "title":  "Port Of Loading"
+                                                                                                      },
+                                                                                  "port_of_discharge":  {
+                                                                                                            "anyOf":  [
+                                                                                                                          {
+                                                                                                                              "type":  "string"
+                                                                                                                          },
+                                                                                                                          {
+                                                                                                                              "type":  "null"
+                                                                                                                          }
+                                                                                                                      ],
+                                                                                                            "title":  "Port Of Discharge"
+                                                                                                        },
+                                                                                  "cargo_description":  {
+                                                                                                            "anyOf":  [
+                                                                                                                          {
+                                                                                                                              "type":  "string"
+                                                                                                                          },
+                                                                                                                          {
+                                                                                                                              "type":  "null"
+                                                                                                                          }
+                                                                                                                      ],
+                                                                                                            "title":  "Cargo Description"
+                                                                                                        },
+                                                                                  "cargo_weight":  {
+                                                                                                       "anyOf":  [
+                                                                                                                     {
+                                                                                                                         "type":  "number"
+                                                                                                                     },
+                                                                                                                     {
+                                                                                                                         "type":  "string"
+                                                                                                                     },
+                                                                                                                     {
+                                                                                                                         "type":  "null"
+                                                                                                                     }
+                                                                                                                 ],
+                                                                                                       "title":  "Cargo Weight"
+                                                                                                   },
+                                                                                  "customs_status":  {
+                                                                                                         "title":  "Customs Status",
+                                                                                                         "type":  "string"
+                                                                                                     },
+                                                                                  "shipping_status":  {
+                                                                                                          "title":  "Shipping Status",
+                                                                                                          "type":  "string"
+                                                                                                      },
+                                                                                  "inspection_status":  {
+                                                                                                            "title":  "Inspection Status",
+                                                                                                            "type":  "string"
+                                                                                                        },
+                                                                                  "customs_duty_amount":  {
+                                                                                                              "anyOf":  [
+                                                                                                                            {
+                                                                                                                                "type":  "number"
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "type":  "string"
+                                                                                                                            },
+                                                                                                                            {
+                                                                                                                                "type":  "null"
+                                                                                                                            }
+                                                                                                                        ],
+                                                                                                              "title":  "Customs Duty Amount"
+                                                                                                          },
+                                                                                  "customs_paid_at":  {
+                                                                                                          "anyOf":  [
+                                                                                                                        {
+                                                                                                                            "format":  "date-time",
+                                                                                                                            "type":  "string"
+                                                                                                                        },
+                                                                                                                        {
+                                                                                                                            "type":  "null"
+                                                                                                                        }
+                                                                                                                    ],
+                                                                                                          "title":  "Customs Paid At"
+                                                                                                      },
+                                                                                  "original_filename":  {
+                                                                                                            "anyOf":  [
+                                                                                                                          {
+                                                                                                                              "type":  "string"
+                                                                                                                          },
+                                                                                                                          {
+                                                                                                                              "type":  "null"
+                                                                                                                          }
+                                                                                                                      ],
+                                                                                                            "title":  "Original Filename"
+                                                                                                        },
+                                                                                  "document_validated":  {
+                                                                                                             "title":  "Document Validated",
+                                                                                                             "type":  "boolean"
+                                                                                                         },
+                                                                                  "validation_errors":  {
+                                                                                                            "items":  {
+                                                                                                                          "type":  "string"
+                                                                                                                      },
+                                                                                                            "title":  "Validation Errors",
+                                                                                                            "type":  "array"
+                                                                                                        },
+                                                                                  "logs":  {
+                                                                                               "items":  {
+                                                                                                             "$ref":  "#/components/schemas/LogEntrySchema"
+                                                                                                         },
+                                                                                               "title":  "Logs",
+                                                                                               "type":  "array"
+                                                                                           },
+                                                                                  "created_at":  {
+                                                                                                     "format":  "date-time",
+                                                                                                     "title":  "Created At",
+                                                                                                     "type":  "string"
+                                                                                                 },
+                                                                                  "updated_at":  {
+                                                                                                     "format":  "date-time",
+                                                                                                     "title":  "Updated At",
+                                                                                                     "type":  "string"
+                                                                                                 }
+                                                                              },
+                                                               "required":  [
+                                                                                "container_id",
+                                                                                "overall_status",
+                                                                                "customs_status",
+                                                                                "shipping_status",
+                                                                                "inspection_status",
+                                                                                "document_validated",
+                                                                                "validation_errors",
+                                                                                "logs",
+                                                                                "created_at",
+                                                                                "updated_at"
+                                                                            ],
+                                                               "title":  "ContainerSchema",
+                                                               "type":  "object"
+                                                           },
+                                       "LogEntrySchema":  {
+                                                              "description":  "Schema for individual log entries in the container workflow",
+                                                              "properties":  {
+                                                                                 "timestamp":  {
+                                                                                                   "title":  "Timestamp",
+                                                                                                   "type":  "string"
+                                                                                               },
+                                                                                 "actor":  {
+                                                                                               "title":  "Actor",
+                                                                                               "type":  "string"
+                                                                                           },
+                                                                                 "action":  {
+                                                                                                "title":  "Action",
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                 "details":  {
+                                                                                                 "title":  "Details",
+                                                                                                 "type":  "string"
+                                                                                             }
+                                                                             },
+                                                              "required":  [
+                                                                               "timestamp",
+                                                                               "actor",
+                                                                               "action",
+                                                                               "details"
+                                                                           ],
+                                                              "title":  "LogEntrySchema",
+                                                              "type":  "object"
+                                                          },
+                                       "ContainerListSchema":  {
+                                                                   "description":  "Schema for listing containers",
+                                                                   "properties":  {
+                                                                                      "containers":  {
+                                                                                                         "items":  {
+                                                                                                                       "$ref":  "#/components/schemas/ContainerSchema"
+                                                                                                                   },
+                                                                                                         "title":  "Containers",
+                                                                                                         "type":  "array"
+                                                                                                     },
+                                                                                      "count":  {
+                                                                                                    "title":  "Count",
+                                                                                                    "type":  "integer"
+                                                                                                }
+                                                                                  },
+                                                                   "required":  [
+                                                                                    "containers",
+                                                                                    "count"
+                                                                                ],
+                                                                   "title":  "ContainerListSchema",
+                                                                   "type":  "object"
+                                                               },
+                                       "ValidationResponseSchema":  {
+                                                                        "description":  "Schema for validation response",
+                                                                        "properties":  {
+                                                                                           "container_id":  {
+                                                                                                                "title":  "Container Id",
+                                                                                                                "type":  "string"
+                                                                                                            },
+                                                                                           "is_valid":  {
+                                                                                                            "title":  "Is Valid",
+                                                                                                            "type":  "boolean"
+                                                                                                        },
+                                                                                           "errors":  {
+                                                                                                          "items":  {
+                                                                                                                        "type":  "string"
+                                                                                                                    },
+                                                                                                          "title":  "Errors",
+                                                                                                          "type":  "array"
+                                                                                                      },
+                                                                                           "message":  {
+                                                                                                           "title":  "Message",
+                                                                                                           "type":  "string"
+                                                                                                       }
+                                                                                       },
+                                                                        "required":  [
+                                                                                         "container_id",
+                                                                                         "is_valid",
+                                                                                         "errors",
+                                                                                         "message"
+                                                                                     ],
+                                                                        "title":  "ValidationResponseSchema",
+                                                                        "type":  "object"
+                                                                    },
+                                       "ValidationRequestSchema":  {
+                                                                       "description":  "Schema for document validation request",
+                                                                       "properties":  {
+                                                                                          "container_id":  {
+                                                                                                               "title":  "Container Id",
+                                                                                                               "type":  "string"
+                                                                                                           },
+                                                                                          "force_revalidate":  {
+                                                                                                                   "default":  false,
+                                                                                                                   "title":  "Force Revalidate",
+                                                                                                                   "type":  "boolean"
+                                                                                                               }
+                                                                                      },
+                                                                       "required":  [
+                                                                                        "container_id"
+                                                                                    ],
+                                                                       "title":  "ValidationRequestSchema",
+                                                                       "type":  "object"
+                                                                   },
+                                       "CustomsStatusResponseSchema":  {
+                                                                           "description":  "Schema for customs status check",
+                                                                           "properties":  {
+                                                                                              "container_id":  {
+                                                                                                                   "title":  "Container Id",
+                                                                                                                   "type":  "string"
+                                                                                                               },
+                                                                                              "customs_status":  {
+                                                                                                                     "title":  "Customs Status",
+                                                                                                                     "type":  "string"
+                                                                                                                 },
+                                                                                              "amount_due":  {
+                                                                                                                 "anyOf":  [
+                                                                                                                               {
+                                                                                                                                   "type":  "number"
+                                                                                                                               },
+                                                                                                                               {
+                                                                                                                                   "type":  "string"
+                                                                                                                               },
+                                                                                                                               {
+                                                                                                                                   "type":  "null"
+                                                                                                                               }
+                                                                                                                           ],
+                                                                                                                 "title":  "Amount Due"
+                                                                                                             },
+                                                                                              "message":  {
+                                                                                                              "title":  "Message",
+                                                                                                              "type":  "string"
+                                                                                                          }
+                                                                                          },
+                                                                           "required":  [
+                                                                                            "container_id",
+                                                                                            "customs_status",
+                                                                                            "message"
+                                                                                        ],
+                                                                           "title":  "CustomsStatusResponseSchema",
+                                                                           "type":  "object"
+                                                                       },
+                                       "CustomsPaymentResponseSchema":  {
+                                                                            "description":  "Schema for customs payment response",
+                                                                            "properties":  {
+                                                                                               "container_id":  {
+                                                                                                                    "title":  "Container Id",
+                                                                                                                    "type":  "string"
+                                                                                                                },
+                                                                                               "status":  {
+                                                                                                              "title":  "Status",
+                                                                                                              "type":  "string"
+                                                                                                          },
+                                                                                               "amount_paid":  {
+                                                                                                                   "anyOf":  [
+                                                                                                                                 {
+                                                                                                                                     "type":  "number"
+                                                                                                                                 },
+                                                                                                                                 {
+                                                                                                                                     "type":  "string"
+                                                                                                                                 }
+                                                                                                                             ],
+                                                                                                                   "title":  "Amount Paid"
+                                                                                                               },
+                                                                                               "payment_date":  {
+                                                                                                                    "format":  "date-time",
+                                                                                                                    "title":  "Payment Date",
+                                                                                                                    "type":  "string"
+                                                                                                                },
+                                                                                               "message":  {
+                                                                                                               "title":  "Message",
+                                                                                                               "type":  "string"
+                                                                                                           }
+                                                                                           },
+                                                                            "required":  [
+                                                                                             "container_id",
+                                                                                             "status",
+                                                                                             "amount_paid",
+                                                                                             "payment_date",
+                                                                                             "message"
+                                                                                         ],
+                                                                            "title":  "CustomsPaymentResponseSchema",
+                                                                            "type":  "object"
+                                                                        },
+                                       "CustomsPaymentRequestSchema":  {
+                                                                           "description":  "Schema for customs payment",
+                                                                           "properties":  {
+                                                                                              "container_id":  {
+                                                                                                                   "title":  "Container Id",
+                                                                                                                   "type":  "string"
+                                                                                                               },
+                                                                                              "amount":  {
+                                                                                                             "anyOf":  [
+                                                                                                                           {
+                                                                                                                               "type":  "number"
+                                                                                                                           },
+                                                                                                                           {
+                                                                                                                               "type":  "string"
+                                                                                                                           }
+                                                                                                                       ],
+                                                                                                             "title":  "Amount"
+                                                                                                         },
+                                                                                              "payment_reference":  {
+                                                                                                                        "anyOf":  [
+                                                                                                                                      {
+                                                                                                                                          "type":  "string"
+                                                                                                                                      },
+                                                                                                                                      {
+                                                                                                                                          "type":  "null"
+                                                                                                                                      }
+                                                                                                                                  ],
+                                                                                                                        "title":  "Payment Reference"
+                                                                                                                    }
+                                                                                          },
+                                                                           "required":  [
+                                                                                            "container_id",
+                                                                                            "amount"
+                                                                                        ],
+                                                                           "title":  "CustomsPaymentRequestSchema",
+                                                                           "type":  "object"
+                                                                       },
+                                       "ShippingStatusResponseSchema":  {
+                                                                            "description":  "Schema for shipping status",
+                                                                            "properties":  {
+                                                                                               "container_id":  {
+                                                                                                                    "title":  "Container Id",
+                                                                                                                    "type":  "string"
+                                                                                                                },
+                                                                                               "shipping_status":  {
+                                                                                                                       "title":  "Shipping Status",
+                                                                                                                       "type":  "string"
+                                                                                                                   },
+                                                                                               "vessel_name":  {
+                                                                                                                   "anyOf":  [
+                                                                                                                                 {
+                                                                                                                                     "type":  "string"
+                                                                                                                                 },
+                                                                                                                                 {
+                                                                                                                                     "type":  "null"
+                                                                                                                                 }
+                                                                                                                             ],
+                                                                                                                   "title":  "Vessel Name"
+                                                                                                               },
+                                                                                               "port_of_discharge":  {
+                                                                                                                         "anyOf":  [
+                                                                                                                                       {
+                                                                                                                                           "type":  "string"
+                                                                                                                                       },
+                                                                                                                                       {
+                                                                                                                                           "type":  "null"
+                                                                                                                                       }
+                                                                                                                                   ],
+                                                                                                                         "title":  "Port Of Discharge"
+                                                                                                                     },
+                                                                                               "message":  {
+                                                                                                               "title":  "Message",
+                                                                                                               "type":  "string"
+                                                                                                           }
+                                                                                           },
+                                                                            "required":  [
+                                                                                             "container_id",
+                                                                                             "shipping_status",
+                                                                                             "message"
+                                                                                         ],
+                                                                            "title":  "ShippingStatusResponseSchema",
+                                                                            "type":  "object"
+                                                                        },
+                                       "InspectionScheduleResponseSchema":  {
+                                                                                "description":  "Schema for inspection scheduling response",
+                                                                                "properties":  {
+                                                                                                   "container_id":  {
+                                                                                                                        "title":  "Container Id",
+                                                                                                                        "type":  "string"
+                                                                                                                    },
+                                                                                                   "inspection_status":  {
+                                                                                                                             "title":  "Inspection Status",
+                                                                                                                             "type":  "string"
+                                                                                                                         },
+                                                                                                   "scheduled_date":  {
+                                                                                                                          "anyOf":  [
+                                                                                                                                        {
+                                                                                                                                            "type":  "string"
+                                                                                                                                        },
+                                                                                                                                        {
+                                                                                                                                            "type":  "null"
+                                                                                                                                        }
+                                                                                                                                    ],
+                                                                                                                          "title":  "Scheduled Date"
+                                                                                                                      },
+                                                                                                   "message":  {
+                                                                                                                   "title":  "Message",
+                                                                                                                   "type":  "string"
+                                                                                                               }
+                                                                                               },
+                                                                                "required":  [
+                                                                                                 "container_id",
+                                                                                                 "inspection_status",
+                                                                                                 "message"
+                                                                                             ],
+                                                                                "title":  "InspectionScheduleResponseSchema",
+                                                                                "type":  "object"
+                                                                            },
+                                       "InspectionScheduleRequestSchema":  {
+                                                                               "description":  "Schema for scheduling inspection",
+                                                                               "properties":  {
+                                                                                                  "container_id":  {
+                                                                                                                       "title":  "Container Id",
+                                                                                                                       "type":  "string"
+                                                                                                                   },
+                                                                                                  "preferred_date":  {
+                                                                                                                         "anyOf":  [
+                                                                                                                                       {
+                                                                                                                                           "type":  "string"
+                                                                                                                                       },
+                                                                                                                                       {
+                                                                                                                                           "type":  "null"
+                                                                                                                                       }
+                                                                                                                                   ],
+                                                                                                                         "title":  "Preferred Date"
+                                                                                                                     }
+                                                                                              },
+                                                                               "required":  [
+                                                                                                "container_id"
+                                                                                            ],
+                                                                               "title":  "InspectionScheduleRequestSchema",
+                                                                               "type":  "object"
+                                                                           },
+                                       "SuccessSchema":  {
+                                                             "description":  "Generic success response",
+                                                             "properties":  {
+                                                                                "message":  {
+                                                                                                "title":  "Message",
+                                                                                                "type":  "string"
+                                                                                            },
+                                                                                "data":  {
+                                                                                             "anyOf":  [
+                                                                                                           {
+                                                                                                               "additionalProperties":  true,
+                                                                                                               "type":  "object"
+                                                                                                           },
+                                                                                                           {
+                                                                                                               "type":  "null"
+                                                                                                           }
+                                                                                                       ],
+                                                                                             "title":  "Data"
+                                                                                         }
+                                                                            },
+                                                             "required":  [
+                                                                              "message"
+                                                                          ],
+                                                             "title":  "SuccessSchema",
+                                                             "type":  "object"
+                                                         }
+                                   }
+                   },
+    "servers":  [
+                    {
+                        "url":  "https://a81732fd9347.ngrok-free.app",
+                        "description":  "PortFlow Backend API (ngrok tunnel)"
+                    }
+                ]
+}
