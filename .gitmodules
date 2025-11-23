@@ -1,3 +1,6 @@
 [submodule "PortFlow-Backend"]
 	path = PortFlow-Backend
 	url = https://github.com/SheriffMudasir/PortFlow-Backend.git
+[submodule "Portflow-Frontend"]
+	path = Portflow-Frontend
+	url = https://github.com/SheriffMudasir/PortFlow-Frontend.git
